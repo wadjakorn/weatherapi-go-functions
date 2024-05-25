@@ -1,11 +1,11 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
-	net_url "net/url"
 	"time"
 )
 
@@ -17,19 +17,12 @@ func Current(w http.ResponseWriter, r *http.Request) {
 	var respString string
 	isFromCache := false
 	kvToken := "AX52ASQgNDU2ZDE5MTEtY2RlMC00MGI1LWFhMDYtZDRjNGNjYWI0OTA5MzgxYTU4MjQ1NWY1NDdiOTg4YWQ4NWUyZjMxM2M2OTQ="
-	kvHeaders := http.Header{}
-	kvHeaders.Add("Authorization", fmt.Sprintf("Bearer %s", kvToken))
-	kvGetUrl, err := net_url.Parse("https://enhanced-seal-32374.upstash.io/get/bangkok")
+	getCacheReq, err := http.NewRequest(http.MethodGet, "https://enhanced-seal-32374.upstash.io/get/bangkok", nil)
 	if err != nil {
 		fmt.Fprintf(w, `<h1>Parse Get Cache URL Error: %s</h1>`, err.Error())
 	} else {
-
-		getCacheReq := http.Request{
-			URL:    kvGetUrl,
-			Method: http.MethodGet,
-			Header: kvHeaders,
-		}
-		cacheResp, err := client.Do(&getCacheReq)
+		getCacheReq.Header.Set("Authorization", fmt.Sprintf("Bearer %s", kvToken))
+		cacheResp, err := client.Do(getCacheReq)
 
 		if err != nil {
 			fmt.Fprintf(w, `<h1>Get Cahce Error: %s</h1>`, err.Error())
@@ -76,16 +69,13 @@ func Current(w http.ResponseWriter, r *http.Request) {
 		respString = string(b)
 
 		//caching
-		kvSetUrl, err := net_url.Parse("https://enhanced-seal-32374.upstash.io/set/bangkok/" + respString)
+		kvSetBody := bytes.NewReader([]byte(fmt.Sprintf(`["HSET", "sessionData", "bangkok", "%s", "ex" ,"10"]`, respString)))
+		kvSeReq, err := http.NewRequest(http.MethodPost, "https://enhanced-seal-32374.upstash.io", kvSetBody)
 		if err != nil {
 			fmt.Fprintf(w, `<h1>Parse Set Cache URL Error: %s</h1>`, err.Error())
 		} else {
-			cacheReq := http.Request{
-				URL:    kvSetUrl,
-				Method: http.MethodPost,
-				Header: kvHeaders,
-			}
-			_, err = client.Do(&cacheReq)
+			kvSeReq.Header.Set("Authorization", fmt.Sprintf("Bearer %s", kvToken))
+			_, err = client.Do(kvSeReq)
 			if err != nil {
 				fmt.Fprintf(w, `<h1>Create Cahce Error: %s</h1>`, err.Error())
 			}
