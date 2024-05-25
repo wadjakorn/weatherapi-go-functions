@@ -27,13 +27,11 @@ func Current(w http.ResponseWriter, r *http.Request) {
 		Header: kvHeaders,
 	}
 	cacheResp, err := client.Do(&getCacheReq)
-	if err != nil {
-		fmt.Fprintf(w, `<h1>Get Cahce Error: %s</h1>`, err.Error())
-	}
-
 	var respString string
 	isFromCache := false
-	if cacheResp.StatusCode == http.StatusOK {
+	if err != nil {
+		fmt.Fprintf(w, `<h1>Get Cahce Error: %s</h1>`, err.Error())
+	} else if cacheResp.StatusCode == http.StatusOK {
 		b, err := io.ReadAll(cacheResp.Body)
 		if err != nil {
 			fmt.Fprintf(w, `<h1>Read Cache Body Error: %s</h1>`, err.Error())
@@ -54,7 +52,7 @@ func Current(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if respString == "" {
+	if !isFromCache {
 		resp, err := client.Get(url)
 		if err != nil {
 			fmt.Fprintf(w, `<h1>Error: %s</h1>`, err.Error())
@@ -89,7 +87,6 @@ func Current(w http.ResponseWriter, r *http.Request) {
 		_, err = client.Do(&cacheReq)
 		if err != nil {
 			fmt.Fprintf(w, `<h1>Create Cahce Error: %s</h1>`, err.Error())
-			return
 		}
 	}
 
