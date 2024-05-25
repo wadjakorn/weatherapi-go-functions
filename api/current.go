@@ -74,9 +74,7 @@ func Current(w http.ResponseWriter, r *http.Request) {
 		}
 
 		respString = string(b)
-	}
 
-	if respString == "" {
 		//caching
 		kvSetUrl, err := net_url.Parse("https://enhanced-seal-32374.upstash.io/set/bangkok/" + respString)
 		if err != nil {
@@ -92,8 +90,9 @@ func Current(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprintf(w, `<h1>Create Cahce Error: %s</h1>`, err.Error())
 			}
 		}
-
 	}
 
-	fmt.Fprintf(w, `<h1>Current Weather %v</h1><pre>%s<pre>`, isFromCache, respString)
+	fmt.Fprintf(w, `<h1>Current Weather</h1><br>
+	<p>cache: %v</p><br>
+	<pre>%s</pre>`, isFromCache, respString)
 }
