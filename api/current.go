@@ -71,7 +71,7 @@ func Current(w http.ResponseWriter, r *http.Request) {
 		kvValue := strings.ReplaceAll(respString, `"`, `\"`)
 
 		//caching
-		kvSetBody := bytes.NewReader([]byte(fmt.Sprintf(`["SET", "bangkok", "%s", "ex" ,"10"]`, kvValue)))
+		kvSetBody := bytes.NewReader([]byte(fmt.Sprintf(`["SET", "bangkok", "%s", "ex" ,"60"]`, kvValue)))
 		kvSeReq, err := http.NewRequest(http.MethodPost, "https://enhanced-seal-32374.upstash.io", kvSetBody)
 		if err != nil {
 			fmt.Printf(`Parse Set Cache URL Error: %s`, err.Error())
