@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func Current(w http.ResponseWriter, r *http.Request) {
+func Bangkok(w http.ResponseWriter, r *http.Request) {
 	q := "bangkok"
 	url := "http://api.weatherapi.com/v1/current.json?key=b8768196a632446db6e52729242505&q=bangkok"
 	client := http.Client{
@@ -25,7 +25,7 @@ func Current(w http.ResponseWriter, r *http.Request) {
 		if len(errorString) > 0 {
 			respStr = "<script>console.log('" + strings.Join(errorString, ",") + "');</script>"
 		}
-		htmlStr := fmt.Sprintf(`<h1>Current Weather</h1><p>cache: %v</p><pre>%s</pre>`, isFromCache, weatherObjectStr)
+		htmlStr := fmt.Sprintf(`<script>console.log('cache:%v')</script><pre>%s</pre>`, isFromCache, weatherObjectStr)
 		respStr = respStr + htmlStr
 		fmt.Fprintf(w, "%s", respStr)
 	}()
