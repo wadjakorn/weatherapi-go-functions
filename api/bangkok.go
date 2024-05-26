@@ -22,7 +22,6 @@ func Bangkok(w http.ResponseWriter, r *http.Request) {
 	client := http.Client{
 		Timeout: time.Second * 30,
 	}
-	var weatherObjectStr string
 	cresp := CustomResponse{
 		Cached: false,
 		Errors: []string{},
@@ -58,7 +57,7 @@ func Bangkok(w http.ResponseWriter, r *http.Request) {
 				}
 
 				if parsedKvResp.Result != "" {
-					weatherObjectStr = parsedKvResp.Result
+					cresp.Result = parsedKvResp.Result
 					cresp.Cached = true
 				}
 			}
@@ -83,8 +82,8 @@ func Bangkok(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		weatherObjectStr = string(b)
-		kvValue := strings.ReplaceAll(weatherObjectStr, `"`, `\"`)
+		cresp.Result = string(b)
+		kvValue := strings.ReplaceAll(cresp.Result, `"`, `\"`)
 
 		//caching
 		kvSetBody := bytes.NewReader([]byte(fmt.Sprintf(`["SET", %s, "%s", "ex" ,"60"]`, q, kvValue)))
