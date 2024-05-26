@@ -86,7 +86,7 @@ func Bangkok(w http.ResponseWriter, r *http.Request) {
 		kvValue := strings.ReplaceAll(cresp.Result, `"`, `\"`)
 
 		//caching
-		kvSetBody := bytes.NewReader([]byte(fmt.Sprintf(`["SET", %s, "%s", "ex" ,"60"]`, q, kvValue)))
+		kvSetBody := bytes.NewReader([]byte(fmt.Sprintf(`["SET", "%s", "%s", "ex" ,"60"]`, q, kvValue)))
 		kvSeReq, err := http.NewRequest(http.MethodPost, "https://enhanced-seal-32374.upstash.io", kvSetBody)
 		if err != nil {
 			cresp.Errors = append(cresp.Errors, fmt.Sprintf(`Parse Set Cache URL Error: %s`, err.Error()))
